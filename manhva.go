@@ -9,10 +9,10 @@ import (
 )
 
 
-func(m *mangalib) GetManhva() (*[]Resp, error) {
+func(m *mangalib) GetManga() (*[]Resp, error) {
 	s, err := m.doRequest("", "")
 
-	res, err := parseBody(s)
+	res, err := parseGetMangaBody(s)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -21,7 +21,7 @@ func(m *mangalib) GetManhva() (*[]Resp, error) {
 	return res, nil
 }
 
-func parseBody(body io.Reader) (*[]Resp, error) {
+func parseGetMangaBody(body io.Reader) (*[]Resp, error) {
 	doc, err := goquery.NewDocumentFromReader(body)
 	if err != nil {
 		return nil, err
