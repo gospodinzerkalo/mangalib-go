@@ -14,10 +14,18 @@ type Manga struct {
 }
 
 func(m *mangalib) GetManga(manga Manga) (*[]Resp, error) {
-	_ = fmt.Sprintf("%s")
-	s, err := m.doRequest("", "")
+	// firstly parse section chapter page for fetching url of first chapter
+	firstCh, err := m.getChapters(manga)
+	if err != nil {
+		return nil, err
+	}
 
-	res, err := parseGetMangaBody(s)
+	resp, err := m.doRequest(firstCh.Name, http.MethodGet)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := parseGetMangaBody(resp, manga.Name)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -26,7 +34,7 @@ func(m *mangalib) GetManga(manga Manga) (*[]Resp, error) {
 	return res, nil
 }
 
-func (m *mangalib) GetChapters(manga Manga) (interface{}, error) {
+func (m *mangalib) getChapters(manga Manga) (*FirstChapter, error) {
 	url := fmt.Sprintf("%s/%s?section=chapters", BASEURL, manga.Name)
 	resp, err := m.doRequest(url, http.MethodGet)
 	if err != nil {
@@ -59,6 +67,7 @@ func parseGetMangaSectionChaptersBody(body io.Reader) (*FirstChapter, error) {
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 		if selection.HasClass("button button_block button_primary") {
 			f, _ := selection.Attr("href")
+			fmt.Println("First: ", f)
 			firstChapter.Name = f
 			return
 		}
@@ -67,17 +76,13 @@ func parseGetMangaSectionChaptersBody(body io.Reader) (*FirstChapter, error) {
 	return &firstChapter, nil
 }
 
-func parseGetMangaBody(body io.Reader) (*[]Resp, error) {
+func parseGetMangaBody(body io.Reader, name string) (*[]Resp, error) {
 	doc, err := goquery.NewDocumentFromReader(body)
 	if err != nil {
 		return nil, err
 	}
 
-	imgUrl := "https://img3.cdnlibs.link//manga/seirei-gensouki-konna-sekai-de-deaeta-kimi-ni-minazuki-futago/chapters/"
-
-
 	id, _  := doc.Find("#comments").Attr("data-post-id")
-	fmt.Println(id)
 	s := doc.Find("#pg").Text()
 	l := strings.Split(s, "=")
 	var res []Resp
@@ -90,7 +95,7 @@ func parseGetMangaBody(body io.Reader) (*[]Resp, error) {
 		}
 		for _, img := range list {
 			res = append(res, Resp{
-				fmt.Sprintf("%s%s/%s", imgUrl, id, img.U),
+				fmt.Sprintf("%s/%s/chapters/%s/%s", IMGURL, name, id, img.U),
 			})
 		}
 	}

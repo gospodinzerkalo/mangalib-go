@@ -4,7 +4,7 @@ import "io"
 
 type Repository interface {
 	GetManga(manga Manga) (*[]Resp, error)
-	GetChapters(manga Manga) (interface{}, error)
+	getChapters(manga Manga) (*FirstChapter, error)
 
 	doRequest(url, method string) (io.Reader, error)
 }
