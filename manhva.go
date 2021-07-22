@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
+	"net/http"
 	"strings"
 )
 
+type Manga struct {
+	Name 	string
+}
 
-func(m *mangalib) GetManga() (*[]Resp, error) {
+func(m *mangalib) GetManga(manga Manga) (*[]Resp, error) {
+	_ = fmt.Sprintf("%s")
 	s, err := m.doRequest("", "")
 
 	res, err := parseGetMangaBody(s)
@@ -19,6 +24,47 @@ func(m *mangalib) GetManga() (*[]Resp, error) {
 	}
 
 	return res, nil
+}
+
+func (m *mangalib) GetChapters(manga Manga) (interface{}, error) {
+	url := fmt.Sprintf("%s/%s?section=chapters", BASEURL, manga.Name)
+	resp, err := m.doRequest(url, http.MethodGet)
+	if err != nil {
+		return nil, err
+	}
+
+	//data, err := io.ReadAll(resp)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//fmt.Println(string(data))
+	//return nil, nil
+	return parseGetMangaSectionChaptersBody(resp)
+}
+
+type FirstChapter struct {
+	Name 	string
+}
+
+func parseGetMangaSectionChaptersBody(body io.Reader) (*FirstChapter, error) {
+	doc, err := goquery.NewDocumentFromReader(body)
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO
+	//firstChapter, _ := doc.Find(".media-sidebar__buttons .section a").Attr("href")
+	firstChapter := FirstChapter{}
+
+	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
+		if selection.HasClass("button button_block button_primary") {
+			f, _ := selection.Attr("href")
+			firstChapter.Name = f
+			return
+		}
+	})
+
+	return &firstChapter, nil
 }
 
 func parseGetMangaBody(body io.Reader) (*[]Resp, error) {
