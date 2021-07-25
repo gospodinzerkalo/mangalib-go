@@ -1,6 +1,7 @@
 package mangalib_go
 
 import (
+	"errors"
 	"io"
 	"net/http"
 )
@@ -18,4 +19,19 @@ func(m mangalib) doRequest(url, method string) (io.Reader, error) {
 	}
 
 	return resp.Body, nil
+}
+
+//checkImageServer
+func checkImageServer(url string, ch chan string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return errors.New("cant get from server")
+	}
+	ch <- url
+	return nil
 }
