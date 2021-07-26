@@ -3,7 +3,7 @@ package mangalib_go
 import "io"
 
 type Repository interface {
-	GetManga(manga Manga) (*[]Resp, error)
+	GetManga(manga Manga) (*MangaResponse, error)
 	getChapters(manga Manga) (*FirstChapter, error)
 	Search(search Search) (*[]SearchResult, error)
 
