@@ -36,20 +36,7 @@ func(m *mangalib) GetManga(manga Manga) (*MangaResponse, error) {
 	return &respManga, nil
 }
 
-// TODO
 func (mr *MangaResponse) NextChapter() (*MangaResponse, error){
-	//if mr.page == 0 {
-	//	return nil, nil
-	//}
-	//
-	//url := strings.Split(mr.url, "/")
-	//if len(url) < 1 {
-	//	return nil, nil
-	//}
-	//
-	//newUrl := strings.Join(url[:len(url) - 1], "/")
-	//newUrl = fmt.Sprintf("%s/c%d", newUrl, mr.page)
-	//fmt.Println(newUrl)
 	if mr.next == "" {
 		return nil, nil
 	}
@@ -58,13 +45,12 @@ func (mr *MangaResponse) NextChapter() (*MangaResponse, error){
 		return nil, err
 	}
 
-	res, _, err := parseGetMangaBody(resp.Body, mr.name)
+	res, mangaInfo, err := parseGetMangaBody(resp.Body, mr.name)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
-	respManga := MangaResponse{Urls: *res, page: mr.page + 1, name: mr.name, url: mr.url}
+	respManga := MangaResponse{Urls: *res, page: mr.page + 1, name: mr.name, url: mr.url, next: mangaInfo.Next.Url}
 
 	return &respManga, nil
 }
@@ -75,13 +61,6 @@ func (m *mangalib) getChapters(manga Manga) (*FirstChapter, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	//data, err := io.ReadAll(resp)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//fmt.Println(string(data))
-	//return nil, nil
 	return parseGetMangaSectionChaptersBody(resp)
 }
 
