@@ -129,7 +129,7 @@ func parseGetMangaBody(body io.Reader, name string) (*[]Resp, *mangaInfo, error)
 		return nil, nil, errors.New("cant parse script")
 	}
 	var servers mangaInfo
-	serversData := strings.TrimSpace(secondScript[1])
+	serversData := strings.TrimSpace(strings.Join(secondScript[1:], "="))
 	if err := json.Unmarshal([]byte(serversData[:len(serversData) - 1]), &servers); err != nil {
 		fmt.Println("ERR 1", secondScript)
 		return nil, nil, err
