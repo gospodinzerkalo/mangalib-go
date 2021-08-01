@@ -7,6 +7,7 @@ type Repository interface {
 	getChapters(manga Manga) (*FirstChapter, error)
 	Search(search Search) (*[]SearchResult, error)
 	GetUpdates() (*[]UpdateResult, error)
+	GetGenres() (*GenresResult, error)
 
 	doRequest(url, method string) (io.Reader, error)
 }
