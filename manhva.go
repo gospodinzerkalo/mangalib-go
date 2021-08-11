@@ -20,8 +20,11 @@ func(m *mangalib) GetManga(manga Manga) (*MangaResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	resp, err := m.doRequest(firstCh.Name, http.MethodGet)
+	req, err := http.NewRequest(http.MethodGet, firstCh.Name, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +60,8 @@ func (mr *MangaResponse) NextChapter() (*MangaResponse, error){
 
 func (m *mangalib) getChapters(manga Manga) (*FirstChapter, error) {
 	url := fmt.Sprintf("%s/%s?section=chapters", BASEURL, manga.Name)
-	resp, err := m.doRequest(url, http.MethodGet)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	resp, err := m.doRequest(req)
 	if err != nil {
 		return nil, err
 	}

@@ -32,7 +32,8 @@ type SearchResult struct {
 
 func (m mangalib) Search(search Search) (*[]SearchResult, error) {
 	url := fmt.Sprintf("%s/search?type=%s&q=%s", BASEURL, search.Type, search.Q)
-	resp, err := m.doRequest(url, http.MethodGet)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	resp, err := m.doRequest(req)
 	if err != nil {
 		return nil, err
 	}

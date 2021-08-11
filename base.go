@@ -1,12 +1,22 @@
 package mangalib_go
 
-type mangalib struct {
+import (
+	"crypto/tls"
+	"net/http"
+)
 
+type mangalib struct {
+	client 		http.Client
 }
 
 
 func NewMangalib() Repository {
-	return &mangalib{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := http.Client{Transport: tr}
+
+	return &mangalib{client: client}
 }
 
 

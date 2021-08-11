@@ -9,12 +9,16 @@ import (
 
 //GetUpdates - get updates of mangas from main page
 func (m mangalib) GetUpdates() (*[]UpdateResult, error) {
-	req, err := m.doRequest(BASEURL, http.MethodGet)
+	req, err := http.NewRequest(http.MethodGet, BASEURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return parseGetUpdatesBody(req, &m)
+	return parseGetUpdatesBody(resp, &m)
 }
 
 type UpdateResult struct {

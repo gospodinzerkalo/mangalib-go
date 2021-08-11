@@ -12,8 +12,9 @@ const (
 	IMGURL = "https://img3.cdnlibs.link//manga"
 )
 
-func(m mangalib) doRequest(url, method string) (io.Reader, error) {
-	resp, err := http.Get(url)
+func(m mangalib) doRequest(req *http.Request) (io.Reader, error) {
+
+	resp, err := m.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

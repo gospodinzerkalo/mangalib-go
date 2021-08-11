@@ -7,17 +7,21 @@ import (
 )
 
 func (m mangalib) GetGenres() (*GenresResult, error){
-	req, err := m.doRequest(BASEURL, http.MethodGet)
+	req, err := http.NewRequest(http.MethodGet, BASEURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := parseGenresBody(req)
+	res, err := parseGenresBody(resp)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GenresResult{Genres: resp}, nil
+	return &GenresResult{Genres: res}, nil
 }
 
 func parseGenresBody(body io.Reader) ([]Genres, error) {
